@@ -1,45 +1,48 @@
-#!/usr/bin/env python
-import json, webbrowser, getopt, os.path, sys
+#!/usr/bin/env python3
+# Original file by Adept-, link below:
+# https://github.com/Adept-/crankyblogger
+import json
+import webbrowser
+import os.path
+import argparse
 import httplib2
 from oauth2client import client
 from apiclient.discovery import build
 from oauth2client.file import Storage
 
-blogId = 0 # put your blog ID here
-isDraft = True # Don't change this unless you are prepared to modify the script
-postfile = ''
-title = 'Default Title' # Change this to the default title you prefer
+with open("my_blog.json") as json_file:
+    data = json.load(json_file)
 
-# comma delimited list of labels for the post.
-# If you set a default list it will be overwritten
-# if lables are supplied in the command line args
-# otherwise the default list is used
-labels = 'linux, rocks'
-
-# At a minimum we must include the file containing our blog post
-if(len(sys.argv) < 2):
-    print("Usage: %s -f \"Filename\" [-t] \"My Title\" [-l] \"label,label\" [--publish]" % sys.argv[0])
-    print("Post's are uploaded as drafts by default. Use --publish if you want to "
-            "publish immediatly\n")
-    sys.exit()
+# Defining argparse and flags, below are the locks to prevent the script from continuing
+parser = argparse.ArgumentParser(description="This script can upload documents to our blogspot blog, refer to the flags below for more information")
+parser.add_argument("-d","--debug", help="Debug application, set to 1 for debuging, default 0", 
+    default=0, type=int, dest="debug")
+parser.add_argument("-f","--file", help="File to be uploaded", 
+    dest="file_upload")
+parser.add_argument("-t","--title", help="Title of the blog post", default=data["defaultTitle"],
+    dest="title")
+parser.add_argument("-l","--label", help="Labels for blog, these need to be comma separated", 
+    default=data["defaultLabels"], dest="label")
+flags = parser.parse_args()
  
-# Handle arguments
-myopts, args = getopt.getopt(sys.argv[1:], "f:t:l:", ['publish'])
-for o, a in myopts:
-    if o == '-f':
-        postfile = a
-    elif o == '--publish':
-        isDraft = False
-    elif o == '-t':
-        title = a
-    elif o == '-l':
-        labels = a
-
-# If we want to publish we must supply a title
-if(isDraft == False and title == 'Default Title'):
-    print("You must provide a title if you want to publish")
-    sys.exit()
-
+# Cruise control for Cool
+if flags.file_upload:
+    file_upload = flags.file_upload
+else:
+    print("[X] File required in order to create post, ending program")
+    exit()
+if flags.title == data["defaultTitle"]:
+    while True:
+        question_1 = input("[!] Default title being used, do you wish to change it? [Y/N] ")
+        if question_1.lower() in ["n","no"]:
+            print("[!] Default title is being used")
+            blog_title = flags.title
+            break
+        elif question_1.lower() in ["y","yes"]:
+            blog_title = input("New title for blog post: ")
+            break
+if flags.label:
+    labels = flags.label
 
 # If there is no userkey authenticate with Google and save the key.
 if(os.path.exists('userkey') == False):
@@ -50,7 +53,7 @@ if(os.path.exists('userkey') == False):
 
     auth_uri = flow.step1_get_authorize_url()
     webbrowser.open_new(auth_uri)
-    auth_code = raw_input('Enter the auth code: ')
+    auth_code = input('Enter the auth code: ')
     credentials = flow.step2_exchange(auth_code)
     http_auth = credentials.authorize(httplib2.Http())
 
@@ -69,10 +72,11 @@ blogger_service = build('blogger', 'v3', http=http_auth)
 
 # Open file for reading
 try:
-    f = open(postfile, 'r')
-except:
-    print("Error open file. Aborting...")
-    sys.exit()
+    f = open(file_upload, 'r')
+except Exception as e:
+    print("Error open file. Aborting, see error below:\n")
+    print(e)
+    exit()
 
 #build a label list
 labels_list = labels.split(',')
@@ -95,5 +99,3 @@ print("Is Draft: %s" % isDraft)
 if(isDraft == False):
     print("URL: %s" % post['url'])
 print("Labels: %s" % post['labels'])
-
-
