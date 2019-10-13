@@ -23,6 +23,9 @@ parser.add_argument("-t","--title", help="Title of the blog post", default=data[
     dest="title")
 parser.add_argument("-l","--label", help="Labels for blog, these need to be comma separated", 
     default=data["defaultLabels"], dest="label")
+parser.add_argument("-p","--publish", 
+    help="Publish file immediately, set to 1 to publish, default is set to 0,", 
+    dest="publish", default=0, type=int)
 flags = parser.parse_args()
  
 # Cruise control for Cool
