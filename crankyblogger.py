@@ -87,18 +87,19 @@ labels_list = labels.split(',')
 #build body object
 body = {
         "content": f.read(),
-        "title": title,
+        "title": blog_title,
         "labels": labels_list
         }
 #Insert the post
 try:
-    post = blogger_service.posts().insert(blogId=blogId, body=body, isDraft=isDraft).execute()
-except:
-    print("Something went wrong uploading this post")
-    sys.exit()
+    post = blogger_service.posts().insert(blogId=data["blogId"], body=body, isDraft=bool(data["postFile"])).execute()
+except Exception as e:
+    print("[X] Something went wrong uploading this post, check the error below\n")
+    print(e)
+    exit()
 
 print("Title: %s" % post['title'])
-print("Is Draft: %s" % isDraft)
-if(isDraft == False):
+print("Is Draft: %s" % bool(data["postFile"]))
+if(bool(data["postFile"]) == False):
     print("URL: %s" % post['url'])
 print("Labels: %s" % post['labels'])
