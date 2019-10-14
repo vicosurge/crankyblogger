@@ -24,7 +24,7 @@ if set as True then the post will always be sent to your blog
 3. defaultTitle - The default title to use if one is not specified
 4. defaultLabels - defaults are used when no labels are given on CLI
 
-#Installation
+##Installation
 This script is intended to work in Python 3, since the Python Foundation is
 ending support for Python 2 in January 1, 2020 there will be no backwards
 compatibility, sorry about this.
@@ -32,18 +32,20 @@ compatibility, sorry about this.
 The required packages to run this script can be installed from the
 requirements.txt file through the following method
 
+```bash
 pip3 install -r requirements.txt
+```
 
-#TIPS
+##TIPS
 1. You can use html2text to view the post in the command line 
 2. or simply fire it up in a browser to see if formating is correct.
 3. Don't forget to use the spellcheck in your editor :)
 4. Your post should be a plain html file
 5. Please enjoy and I welcome public contributions!
 
-#TODO
+##TODO
 Implement editing and deleting of blog posts
 
-#LICENSE
+##LICENSE
 Do what ever you want with it. No WARRANTY. If you share a copy with someone
 else, it must be under the same license.
